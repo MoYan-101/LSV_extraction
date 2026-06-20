@@ -1,17 +1,17 @@
 {
   "plot_area": {
-    "left": 12,
-    "right": 630,
-    "top": 33,
-    "bottom": 450
+    "left": 164,
+    "right": 573,
+    "top": 223,
+    "bottom": 445
   },
   "axes": {
     "x": {
       "min": 1.0,
       "max": 2.0,
       "scale": "linear",
-      "pixel_min": 12,
-      "pixel_max": 630,
+      "pixel_min": 164,
+      "pixel_max": 573,
       "calibration": [
         {
           "pixel": 12,
@@ -37,14 +37,15 @@
           "pixel": 628,
           "value": 2.0
         }
-      ]
+      ],
+      "major_tick_count": 6
     },
     "y": {
       "min": 0.0,
       "max": 24.0,
       "scale": "linear",
-      "pixel_min": 450,
-      "pixel_max": 33,
+      "pixel_min": 445,
+      "pixel_max": 223,
       "calibration": [
         {
           "pixel": 405,
@@ -74,7 +75,8 @@
           "pixel": 38,
           "value": 24.0
         }
-      ]
+      ],
+      "major_tick_count": 7
     }
   },
   "border_margin_px": 2,
@@ -557,8 +559,7 @@
     "score": 72.0,
     "warnings": [
       "x: tick residual 12.8px > 3px",
-      "y: tick residual 4.8px > 3px",
-      "y: tick span covers 88% of plot area"
+      "y: tick residual 4.8px > 3px"
     ],
     "x": {
       "expected_count": 6,
@@ -573,7 +574,7 @@
       ],
       "max_residual_px": 10.964683002722817,
       "max_spacing_residual_px": 12.800000000000011,
-      "coverage": 0.9967637540453075,
+      "coverage": 1.5061124694376529,
       "candidate_match_ratio": 1.0,
       "mean_strength_ratio": 0.38364779874213834,
       "score": 72.0,
@@ -596,14 +597,13 @@
       ],
       "max_residual_px": 3.097132826214077,
       "max_spacing_residual_px": 4.833333333333314,
-      "coverage": 0.8800959232613909,
+      "coverage": 1.6531531531531531,
       "candidate_match_ratio": 1.0,
       "mean_strength_ratio": 0.8018433179723502,
-      "score": 73.7,
-      "status": "review",
+      "score": 80.7,
+      "status": "pass",
       "warnings": [
-        "tick residual 4.8px > 3px",
-        "tick span covers 88% of plot area"
+        "tick residual 4.8px > 3px"
       ]
     },
     "y_label_rows": [],
@@ -612,6 +612,348 @@
     "verified": false,
     "verified_at": null,
     "verified_note": "",
+    "plot_area_verified": false,
+    "plot_area_verified_at": null,
+    "plot_area_status": "review",
+    "plot_area_score": 67.8,
     "usable": false
+  },
+  "plot_area_detection": {
+    "status": "review",
+    "score": 67.8,
+    "source": "tick-label",
+    "warnings": [
+      "height ratio 0.39",
+      "weak border 15.6",
+      "x label count 5",
+      "y label count 3",
+      "y labels gap 62.0px"
+    ],
+    "candidates": [
+      {
+        "plot_area": {
+          "left": 164,
+          "right": 573,
+          "top": 223,
+          "bottom": 445
+        },
+        "source": "tick-label",
+        "score": 67.8,
+        "status": "review",
+        "warnings": [
+          "height ratio 0.39",
+          "weak border 15.6",
+          "x label count 5",
+          "y label count 3",
+          "y labels gap 62.0px"
+        ],
+        "details": {}
+      },
+      {
+        "plot_area": {
+          "left": 110,
+          "right": 632,
+          "top": 32,
+          "bottom": 452
+        },
+        "source": "contour",
+        "score": 66.6,
+        "status": "review",
+        "warnings": [
+          "weak border 8.2",
+          "x label count 5",
+          "y label count 3"
+        ],
+        "details": {}
+      },
+      {
+        "plot_area": {
+          "left": 12,
+          "right": 630,
+          "top": 33,
+          "bottom": 450
+        },
+        "source": "hough",
+        "score": 57.0,
+        "status": "review",
+        "warnings": [
+          "width ratio 0.96",
+          "x label count 5",
+          "y label count 3",
+          "y labels gap -90.0px"
+        ],
+        "details": {}
+      }
+    ],
+    "x_labels": {
+      "status": "review",
+      "count": 5,
+      "min": 1.2,
+      "max": 2.4,
+      "confidence": 94.8,
+      "max_spacing_residual_px": 1.98,
+      "value_spacing_residual": 0.0,
+      "numbers": [
+        {
+          "text": "1.2",
+          "value": 1.2,
+          "confidence": 95.0,
+          "left": 163.3,
+          "top": 459.0,
+          "width": 38.7,
+          "height": 22.7,
+          "center_x": 182.7,
+          "center_y": 470.3
+        },
+        {
+          "text": "1.5",
+          "value": 1.5,
+          "confidence": 96.0,
+          "left": 266.3,
+          "top": 459.0,
+          "width": 38.7,
+          "height": 22.7,
+          "center_x": 285.7,
+          "center_y": 470.3
+        },
+        {
+          "text": "1.8",
+          "value": 1.8,
+          "confidence": 96.0,
+          "left": 370.0,
+          "top": 459.0,
+          "width": 38.0,
+          "height": 22.7,
+          "center_x": 389.0,
+          "center_y": 470.3
+        },
+        {
+          "text": "2.1",
+          "value": 2.1,
+          "confidence": 94.0,
+          "left": 470.7,
+          "top": 459.0,
+          "width": 37.0,
+          "height": 22.7,
+          "center_x": 489.2,
+          "center_y": 470.3
+        },
+        {
+          "text": "2.4",
+          "value": 2.4,
+          "confidence": 93.0,
+          "left": 573.3,
+          "top": 459.0,
+          "width": 41.3,
+          "height": 22.7,
+          "center_x": 594.0,
+          "center_y": 470.3
+        }
+      ],
+      "warnings": [
+        "x label count 5 != expected 6"
+      ],
+      "all_numbers": [
+        {
+          "text": "1.2",
+          "value": 1.2,
+          "confidence": 95.0,
+          "left": 163.3,
+          "top": 459.0,
+          "width": 38.7,
+          "height": 22.7,
+          "center_x": 182.7,
+          "center_y": 470.3
+        },
+        {
+          "text": "1.5",
+          "value": 1.5,
+          "confidence": 96.0,
+          "left": 266.3,
+          "top": 459.0,
+          "width": 38.7,
+          "height": 22.7,
+          "center_x": 285.7,
+          "center_y": 470.3
+        },
+        {
+          "text": "1.8",
+          "value": 1.8,
+          "confidence": 96.0,
+          "left": 370.0,
+          "top": 459.0,
+          "width": 38.0,
+          "height": 22.7,
+          "center_x": 389.0,
+          "center_y": 470.3
+        },
+        {
+          "text": "2.1",
+          "value": 2.1,
+          "confidence": 94.0,
+          "left": 470.7,
+          "top": 459.0,
+          "width": 37.0,
+          "height": 22.7,
+          "center_x": 489.2,
+          "center_y": 470.3
+        },
+        {
+          "text": "2.4",
+          "value": 2.4,
+          "confidence": 93.0,
+          "left": 573.3,
+          "top": 459.0,
+          "width": 41.3,
+          "height": 22.7,
+          "center_x": 594.0,
+          "center_y": 470.3
+        }
+      ],
+      "roi": {
+        "x1": 0,
+        "x2": 642,
+        "y1": 310,
+        "y2": 524
+      }
+    },
+    "y_labels": {
+      "status": "review",
+      "count": 3,
+      "min": 0.0,
+      "max": 210.0,
+      "confidence": 66.0,
+      "max_spacing_residual_px": 33.65,
+      "value_spacing_residual": 100.0,
+      "numbers": [
+        {
+          "text": "0",
+          "value": 0.0,
+          "confidence": 92.0,
+          "left": 88.0,
+          "top": 430.3,
+          "width": 14.0,
+          "height": 22.7,
+          "center_x": 95.0,
+          "center_y": 441.7
+        },
+        {
+          "text": "5",
+          "value": 5.0,
+          "confidence": 68.0,
+          "left": 27.0,
+          "top": 356.3,
+          "width": 16.3,
+          "height": 29.3,
+          "center_x": 35.2,
+          "center_y": 371.0
+        },
+        {
+          "text": "210",
+          "value": 210.0,
+          "confidence": 38.0,
+          "left": 27.0,
+          "top": 216.3,
+          "width": 75.0,
+          "height": 33.3,
+          "center_x": 64.5,
+          "center_y": 233.0
+        }
+      ],
+      "warnings": [
+        "tick label spacing residual 33.6px > 18px",
+        "tick value spacing residual 100 is too large",
+        "y label count 3 != expected 7"
+      ],
+      "all_numbers": [
+        {
+          "text": "20",
+          "value": 20.0,
+          "confidence": 0.0,
+          "left": 24.7,
+          "top": 21.0,
+          "width": 77.3,
+          "height": 23.0,
+          "center_x": 63.3,
+          "center_y": 32.5
+        },
+        {
+          "text": "45",
+          "value": 45.0,
+          "confidence": 0.0,
+          "left": 21.0,
+          "top": 102.3,
+          "width": 78.7,
+          "height": 57.3,
+          "center_x": 60.3,
+          "center_y": 131.0
+        },
+        {
+          "text": "2",
+          "value": 2.0,
+          "confidence": 0.0,
+          "left": 22.3,
+          "top": 162.7,
+          "width": 27.3,
+          "height": 43.7,
+          "center_x": 36.0,
+          "center_y": 184.5
+        },
+        {
+          "text": "210",
+          "value": 210.0,
+          "confidence": 38.0,
+          "left": 27.0,
+          "top": 216.3,
+          "width": 75.0,
+          "height": 33.3,
+          "center_x": 64.5,
+          "center_y": 233.0
+        },
+        {
+          "text": "5",
+          "value": 5.0,
+          "confidence": 0.0,
+          "left": 27.0,
+          "top": 327.3,
+          "width": 75.0,
+          "height": 27.0,
+          "center_x": 64.5,
+          "center_y": 340.8
+        },
+        {
+          "text": "5",
+          "value": 5.0,
+          "confidence": 68.0,
+          "left": 27.0,
+          "top": 356.3,
+          "width": 16.3,
+          "height": 29.3,
+          "center_x": 35.2,
+          "center_y": 371.0
+        },
+        {
+          "text": "0",
+          "value": 0.0,
+          "confidence": 92.0,
+          "left": 88.0,
+          "top": 430.3,
+          "width": 14.0,
+          "height": 22.7,
+          "center_x": 95.0,
+          "center_y": 441.7
+        }
+      ],
+      "roi": {
+        "x1": 0,
+        "x2": 102,
+        "y1": 0,
+        "y2": 496
+      }
+    },
+    "ocr_available": true
+  },
+  "plot_area_verification": {
+    "verified": false
   }
 }
