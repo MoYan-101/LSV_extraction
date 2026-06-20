@@ -209,14 +209,16 @@ line_digitizer/batch_outputs/
 1. 选择一张图
 2. 在左侧输入 x/y min、x/y max，以及 x/y major tick count；也可以先点 Auto read axis ranges 让 OCR 给建议值
 3. 在 Plot area 模式确认橙色框覆盖绘图区，必要时点 Re-detect plot area
-4. 点击 Auto detect ticks，界面会自动切到 Ticks
-5. 看绿色 tick 是否压在真实主刻度上
-6. 如有整体偏移，在 Ticks 模式拖动图上的 tick overlay，然后点 Apply movement
-7. 如果整体移动还不够准，打开 Advanced: click exact ticks 手动点击主刻度
-8. 需要时在 Advanced: curve colors 里检测或调整颜色
-9. 点击 Confirm ticks + preview CSV
-10. 界面会自动切到 Points，看提取点是否压在原曲线上
-11. 点 Next
+4. 如果框线不准，勾选 Redraw by two corners，在图上点左上角和右下角后点 Apply plot area
+5. 点击 Confirm plot area
+6. 点击 Auto detect ticks，界面会自动切到 Ticks
+7. 看绿色 tick 是否压在真实主刻度上
+8. 如有整体偏移，在 Ticks 模式拖动图上的 tick overlay，然后点 Apply movement
+9. 如果整体移动还不够准，打开 Advanced: click exact ticks 手动点击主刻度
+10. 需要时在 Advanced: curve colors 里检测或调整颜色
+11. 点击 Confirm ticks + preview CSV
+12. 界面会自动切到 Points，看提取点是否压在原曲线上
+13. 点 Next
 ```
 
 `Auto read axis ranges` 用本地 Tesseract OCR 读取坐标轴 tick label 数字，只会生成 suggested values，不会自动覆盖当前设置。确认建议值正确后，点 `Apply x`、`Apply y` 或 `Apply all`，再继续 `Auto detect ticks`。
@@ -235,6 +237,8 @@ sudo apt install tesseract-ocr
 ```
 
 OCR 不可用时 UI 仍然能正常打开，只是 `Auto read axis ranges` 会提示安装方法。OCR 结果里 `pass/review/fail` 只表示识别质量；因为数据必须 100% 人工确认，所以它永远只是建议值。
+
+Plot area 自动检测现在会联合多种候选：框线 Hough、深色投影、轮廓矩形，以及 tick label OCR。Plot area overlay 中橙色框是当前候选，灰色框是其他候选，蓝色/绿色点是 OCR 识别到的 x/y tick label 中心。自动分数只用于排序和提醒；只有点击 `Confirm plot area` 后，后续 CSV 才能被标记为 usable。
 
 批量自动处理：
 

@@ -377,9 +377,11 @@ def frame_to_calibration(frame):
 
 def make_default_config(image_path, x_min, x_max, y_min, y_max, x_step, series_frame):
     image = ld.load_image(image_path)
-    plot_area = ld.auto_detect_plot_area(image) or ld.default_plot_area(image)
+    plot_area, plot_detection = detect_plot_area_candidates(image, x_tick_count=6, y_tick_count=7)
     return {
         "plot_area": plot_area,
+        "plot_area_detection": plot_detection,
+        "plot_area_verification": {"verified": False},
         "axes": {
             "x": {
                 "min": float(x_min),
@@ -796,11 +798,24 @@ def infer_axis_range_from_ocr(candidates, axis_name):
 
 def read_axis_numbers_with_tesseract(image, plot_area, axis_name):
     roi = axis_ocr_roi(image, plot_area, axis_name)
-    processed, scale = preprocess_axis_ocr_roi(image, roi)
+    read = read_numbers_from_roi(image, roi, psm=6)
+    numbers = []
+    for number in read["numbers"]:
+        if axis_name == "y":
+            # Ignore far-left rotated axis-title artifacts such as the "2" in cm2.
+            if float(number["left"]) + float(number["width"]) < float(plot_area["left"]) - 68.0:
+                continue
+        numbers.append(number)
+    read["numbers"] = numbers
+    return read
+
+
+def read_numbers_from_roi(image, roi, psm=6, scale=3):
+    processed, scale = preprocess_axis_ocr_roi(image, roi, scale=scale)
     if processed is None:
         return {"raw_text": "", "numbers": [], "roi": roi, "warnings": ["empty OCR ROI"]}
 
-    config = "--psm 6 -c tessedit_char_whitelist=0123456789.-+"
+    config = f"--psm {int(psm)} -c tessedit_char_whitelist=0123456789.-+"
     data = pytesseract.image_to_data(processed, config=config, output_type=pytesseract.Output.DICT)
     numbers = []
     raw_text = []
@@ -824,10 +839,6 @@ def read_axis_numbers_with_tesseract(image, plot_area, axis_name):
         center_x = left + width / 2.0
         center_y = top + height / 2.0
 
-        if axis_name == "y":
-            # Ignore far-left rotated axis-title artifacts such as the "2" in cm2.
-            if left + width < float(plot_area["left"]) - 68.0:
-                continue
         numbers.append(
             {
                 "text": str(text),
@@ -904,6 +915,456 @@ def axis_ocr_suggestion_frame(axis_ocr):
     return pd.DataFrame(rows)
 
 
+def finite_plot_area(plot_area):
+    try:
+        return {
+            "left": int(round(float(plot_area["left"]))),
+            "right": int(round(float(plot_area["right"]))),
+            "top": int(round(float(plot_area["top"]))),
+            "bottom": int(round(float(plot_area["bottom"]))),
+        }
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def plot_area_signature(plot_area):
+    plot_area = finite_plot_area(plot_area)
+    if not plot_area:
+        return None
+    return (plot_area["left"], plot_area["right"], plot_area["top"], plot_area["bottom"])
+
+
+def add_plot_area_candidate(candidates, image, plot_area, source, details=None):
+    plot_area = finite_plot_area(plot_area)
+    if not plot_area:
+        return
+    plot_area = ld.normalize_plot_area(plot_area, image)
+    height, width = image.shape[:2]
+    if plot_area["right"] - plot_area["left"] < width * 0.18:
+        return
+    if plot_area["bottom"] - plot_area["top"] < height * 0.18:
+        return
+    signature = plot_area_signature(plot_area)
+    if signature in {plot_area_signature(item["plot_area"]) for item in candidates}:
+        return
+    candidates.append({"plot_area": plot_area, "source": source, "details": details or {}})
+
+
+def filtered_ocr_numbers(numbers, axis_name):
+    filtered = []
+    for item in numbers:
+        width = float(item.get("width", 0))
+        height = float(item.get("height", 0))
+        value = item.get("value")
+        if value is None:
+            continue
+        if height < 5 or height > 46:
+            continue
+        if width < 2 or width > (95 if axis_name == "y" else 90):
+            continue
+        filtered.append(item)
+    return filtered
+
+
+def group_numbers_by_row(numbers, tolerance=12):
+    if not numbers:
+        return []
+    ordered = sorted(numbers, key=lambda item: float(item["center_y"]))
+    groups = [[ordered[0]]]
+    for item in ordered[1:]:
+        if abs(float(item["center_y"]) - float(groups[-1][-1]["center_y"])) <= tolerance:
+            groups[-1].append(item)
+        else:
+            groups.append([item])
+    return groups
+
+
+def label_sequence_score(items, axis_name, expected_count=None):
+    if len(items) < 2:
+        return 100000.0
+    pixel_residual = spacing_residual_px(items, axis_name)
+    _, value_ratio = value_spacing_residual(items)
+    mean_conf = np.mean([max(0.0, float(item.get("confidence", 0.0))) for item in items])
+    count_penalty = 0.0
+    if expected_count:
+        count_penalty = 30.0 * abs(len(items) - int(expected_count))
+    return count_penalty + pixel_residual + value_ratio * 35.0 - mean_conf * 0.04 - len(items) * 3.0
+
+
+def best_x_label_sequence(numbers, expected_count=None):
+    best = None
+    for group in group_numbers_by_row(filtered_ocr_numbers(numbers, "x"), tolerance=11):
+        if len(group) < 2:
+            continue
+        selected = longest_increasing_axis_sequence(group, "x")
+        if len(selected) < 2:
+            continue
+        selected = sorted(selected, key=lambda item: float(item["center_x"]))
+        score = label_sequence_score(selected, "x", expected_count)
+        candidate = (score, selected)
+        if best is None or candidate[0] < best[0]:
+            best = candidate
+    return [] if best is None else best[1]
+
+
+def best_y_label_sequence(numbers, expected_count=None):
+    selected = longest_increasing_axis_sequence(filtered_ocr_numbers(numbers, "y"), "y")
+    if len(selected) < 2:
+        return []
+    if expected_count and len(selected) > int(expected_count):
+        # Keep the best evenly spaced subsequence with the requested length.
+        ordered = sorted(selected, key=lambda item: float(item["center_y"]), reverse=True)
+        best = None
+        count = int(expected_count)
+        for start in range(0, len(ordered) - count + 1):
+            subset = ordered[start : start + count]
+            score = label_sequence_score(subset, "y", expected_count)
+            candidate = (score, subset)
+            if best is None or candidate[0] < best[0]:
+                best = candidate
+        selected = best[1] if best else ordered[:count]
+    return sorted(selected, key=lambda item: float(item["center_y"]), reverse=True)
+
+
+def global_tick_label_rois(image):
+    height, width = image.shape[:2]
+    return {
+        "x": {
+            "x1": 0,
+            "x2": width,
+            "y1": int(height * 0.55),
+            "y2": min(height, int(height * 0.93)),
+        },
+        "y": {
+            "x1": 0,
+            "x2": min(width, max(90, int(width * 0.16))),
+            "y1": 0,
+            "y2": min(height, int(height * 0.88)),
+        },
+    }
+
+
+def detect_global_tick_labels(image, x_tick_count=None, y_tick_count=None):
+    status = axis_ocr_status()
+    result = {
+        "available": bool(status.get("available")),
+        "x": {"status": "fail", "numbers": [], "all_numbers": [], "warnings": []},
+        "y": {"status": "fail", "numbers": [], "all_numbers": [], "warnings": []},
+        "warnings": [],
+    }
+    if not status.get("available"):
+        result["warnings"].append(status.get("message", "OCR is not available."))
+        return result
+
+    rois = global_tick_label_rois(image)
+    try:
+        x_read = read_numbers_from_roi(image, rois["x"], psm=6)
+        x_numbers = best_x_label_sequence(x_read["numbers"], x_tick_count)
+        x_inferred = infer_axis_range_from_ocr(x_numbers, "x")
+        x_inferred["all_numbers"] = x_read["numbers"]
+        x_inferred["roi"] = rois["x"]
+        result["x"] = x_inferred
+    except Exception as exc:
+        result["x"]["warnings"].append(str(exc))
+
+    try:
+        y_read = read_numbers_from_roi(image, rois["y"], psm=6)
+        y_numbers = best_y_label_sequence(y_read["numbers"], y_tick_count)
+        y_inferred = infer_axis_range_from_ocr(y_numbers, "y")
+        y_inferred["all_numbers"] = y_read["numbers"]
+        y_inferred["roi"] = rois["y"]
+        result["y"] = y_inferred
+    except Exception as exc:
+        result["y"]["warnings"].append(str(exc))
+
+    for axis_name, expected_count in (("x", x_tick_count), ("y", y_tick_count)):
+        axis = result[axis_name]
+        if expected_count and axis.get("count", 0) != int(expected_count):
+            axis.setdefault("warnings", []).append(
+                f"{axis_name} label count {axis.get('count', 0)} != expected {int(expected_count)}"
+            )
+            if axis.get("status") == "pass":
+                axis["status"] = "review"
+    result["warnings"] = [
+        f"{axis}: {warning}"
+        for axis in ("x", "y")
+        for warning in result.get(axis, {}).get("warnings", [])
+    ]
+    return result
+
+
+def line_strengths(gray, axis_name, dark_threshold=185):
+    dark = (gray <= int(dark_threshold)).astype(np.uint8)
+    if axis_name == "horizontal":
+        return np.sum(dark, axis=1).astype(np.float64)
+    return np.sum(dark, axis=0).astype(np.float64)
+
+
+def smooth_scores(scores, window=9):
+    if len(scores) == 0:
+        return scores
+    kernel = np.ones(int(window), dtype=np.float64) / float(window)
+    return np.convolve(scores, kernel, mode="same")
+
+
+def best_line_in_range(gray, axis_name, start, end, span_start=None, span_end=None):
+    height, width = gray.shape[:2]
+    start = max(0, int(round(start)))
+    end = min((height if axis_name == "horizontal" else width) - 1, int(round(end)))
+    if end < start:
+        return None
+    if axis_name == "horizontal":
+        x1 = max(0, int(round(span_start if span_start is not None else 0)))
+        x2 = min(width, int(round(span_end if span_end is not None else width)))
+        region = gray[start : end + 1, x1:x2]
+        if region.size == 0:
+            return None
+        scores = smooth_scores(line_strengths(region, "horizontal"))
+        return int(start + int(np.argmax(scores)))
+    y1 = max(0, int(round(span_start if span_start is not None else 0)))
+    y2 = min(height, int(round(span_end if span_end is not None else height)))
+    region = gray[y1:y2, start : end + 1]
+    if region.size == 0:
+        return None
+    scores = smooth_scores(line_strengths(region, "vertical"))
+    return int(start + int(np.argmax(scores)))
+
+
+def projection_plot_area_candidate(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (3, 3), 0)
+    height, width = gray.shape[:2]
+    row_scores = smooth_scores(line_strengths(gray, "horizontal"))
+    col_scores = smooth_scores(line_strengths(gray, "vertical"))
+    row_threshold = np.percentile(row_scores, 92)
+    col_threshold = np.percentile(col_scores, 92)
+    rows = [idx for idx, score in enumerate(row_scores) if score >= row_threshold]
+    cols = [idx for idx, score in enumerate(col_scores) if score >= col_threshold]
+    if len(rows) < 2 or len(cols) < 2:
+        return None
+
+    top_candidates = [row for row in rows if row <= height * 0.35]
+    bottom_candidates = [row for row in rows if row >= height * 0.45]
+    left_candidates = [col for col in cols if width * 0.04 <= col <= width * 0.35]
+    right_candidates = [col for col in cols if width * 0.45 <= col <= width * 0.98]
+    if not top_candidates or not bottom_candidates or not left_candidates or not right_candidates:
+        return None
+    top = max(top_candidates, key=lambda row: row_scores[row])
+    bottom = max(bottom_candidates, key=lambda row: row_scores[row])
+    left = max(left_candidates, key=lambda col: col_scores[col])
+    right = max(right_candidates, key=lambda col: col_scores[col])
+    if bottom <= top or right <= left:
+        return None
+    return {"left": left, "right": right, "top": top, "bottom": bottom}
+
+
+def contour_plot_area_candidate(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(cv2.GaussianBlur(gray, (3, 3), 0), 50, 150)
+    edges = cv2.dilate(edges, np.ones((3, 3), np.uint8), iterations=1)
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    height, width = gray.shape[:2]
+    best = None
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        if w < width * 0.25 or h < height * 0.25:
+            continue
+        if x < 2 or y < 2 or x + w > width - 2 or y + h > height - 2:
+            continue
+        area_ratio = (w * h) / float(width * height)
+        if area_ratio < 0.15 or area_ratio > 0.9:
+            continue
+        score = w + h
+        if best is None or score > best[0]:
+            best = (score, {"left": x, "right": x + w, "top": y, "bottom": y + h})
+    return None if best is None else best[1]
+
+
+def label_first_plot_area_candidate(image, labels):
+    x_numbers = labels.get("x", {}).get("numbers", [])
+    y_numbers = labels.get("y", {}).get("numbers", [])
+    if len(x_numbers) < 2 or len(y_numbers) < 2:
+        return None
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    height, width = gray.shape[:2]
+    x_numbers = sorted(x_numbers, key=lambda item: float(item["center_x"]))
+    y_numbers = sorted(y_numbers, key=lambda item: float(item["center_y"]), reverse=True)
+
+    left_est = float(x_numbers[0]["center_x"])
+    right_est = float(x_numbers[-1]["center_x"])
+    x_label_top = min(float(item["top"]) for item in x_numbers)
+    bottom_est = x_label_top - 15.0
+    top_label_center = float(y_numbers[-1]["center_y"])
+    bottom_label_center = float(y_numbers[0]["center_y"])
+
+    x_span_left = max(0, left_est - 5)
+    x_span_right = min(width, right_est + 5)
+    bottom = best_line_in_range(gray, "horizontal", x_label_top - 42, x_label_top - 3, x_span_left, x_span_right)
+    top = best_line_in_range(gray, "horizontal", top_label_center - 35, top_label_center + 8, x_span_left, x_span_right)
+    left = best_line_in_range(gray, "vertical", left_est - 25, left_est + 25, top or 0, bottom or height)
+    right = best_line_in_range(gray, "vertical", right_est - 25, right_est + 25, top or 0, bottom or height)
+
+    candidate = {
+        "left": int(round(left if left is not None else left_est)),
+        "right": int(round(right if right is not None else right_est)),
+        "top": int(round(top if top is not None else top_label_center)),
+        "bottom": int(round(bottom if bottom is not None else max(bottom_est, bottom_label_center))),
+    }
+    return candidate
+
+
+def border_strength(image, plot_area):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    dark = gray <= 185
+    left, right, top, bottom = plot_area["left"], plot_area["right"], plot_area["top"], plot_area["bottom"]
+    h_band = max(1, right - left + 1)
+    v_band = max(1, bottom - top + 1)
+    scores = [
+        float(np.mean(dark[max(0, top - 1) : min(gray.shape[0], top + 2), left : right + 1])),
+        float(np.mean(dark[max(0, bottom - 1) : min(gray.shape[0], bottom + 2), left : right + 1])),
+        float(np.mean(dark[top : bottom + 1, max(0, left - 1) : min(gray.shape[1], left + 2)])),
+        float(np.mean(dark[top : bottom + 1, max(0, right - 1) : min(gray.shape[1], right + 2)])),
+    ]
+    return 100.0 * float(np.mean([score for score in scores if not np.isnan(score)]))
+
+
+def label_alignment_score(plot_area, labels, x_tick_count=None, y_tick_count=None):
+    score = 0.0
+    warnings = []
+    x_numbers = labels.get("x", {}).get("numbers", [])
+    y_numbers = labels.get("y", {}).get("numbers", [])
+    if x_numbers:
+        if x_tick_count and len(x_numbers) == int(x_tick_count):
+            score += 12.0
+        else:
+            warnings.append(f"x label count {len(x_numbers)}")
+        x_numbers = sorted(x_numbers, key=lambda item: float(item["center_x"]))
+        x_edge_error = abs(float(x_numbers[0]["center_x"]) - plot_area["left"]) + abs(
+            float(x_numbers[-1]["center_x"]) - plot_area["right"]
+        )
+        score += max(0.0, 16.0 - x_edge_error * 0.35)
+        label_gap = min(float(item["top"]) for item in x_numbers) - plot_area["bottom"]
+        if 2 <= label_gap <= 45:
+            score += 12.0
+        else:
+            warnings.append(f"x labels gap {label_gap:.1f}px")
+    else:
+        warnings.append("no x OCR labels")
+
+    if y_numbers:
+        if y_tick_count and len(y_numbers) == int(y_tick_count):
+            score += 12.0
+        else:
+            warnings.append(f"y label count {len(y_numbers)}")
+        y_numbers = sorted(y_numbers, key=lambda item: float(item["center_y"]), reverse=True)
+        y_edge_error = abs(float(y_numbers[0]["center_y"]) - plot_area["bottom"]) + abs(
+            float(y_numbers[-1]["center_y"]) - plot_area["top"]
+        )
+        score += max(0.0, 14.0 - y_edge_error * 0.25)
+        rightmost_label = max(float(item["left"]) + float(item["width"]) for item in y_numbers)
+        label_gap = plot_area["left"] - rightmost_label
+        if -8 <= label_gap <= 45:
+            score += 12.0
+        else:
+            warnings.append(f"y labels gap {label_gap:.1f}px")
+    else:
+        warnings.append("no y OCR labels")
+    return score, warnings
+
+
+def tick_consistency_score(image, plot_area, tick_params, x_tick_count=None, y_tick_count=None):
+    if not (x_tick_count and y_tick_count):
+        return 0.0, []
+    params = tick_params or {"search_px": 18, "dark_threshold": 170, "min_tick_len": 5, "max_cluster_width": 14}
+    ticks = ld.auto_detect_ticks(
+        image,
+        plot_area,
+        search_px=params.get("search_px", 18),
+        dark_threshold=params.get("dark_threshold", 170),
+        min_tick_len=params.get("min_tick_len", 5),
+        max_cluster_width=params.get("max_cluster_width", 14),
+    )
+    x_error = tick_target_error(ticks.get("x", []), int(x_tick_count), plot_area, "x")
+    y_error = tick_target_error(ticks.get("y", []), int(y_tick_count), plot_area, "y")
+    score = max(0.0, 22.0 - min(22.0, (x_error + y_error) * 0.9))
+    warnings = []
+    if len(ticks.get("x", [])) < int(x_tick_count):
+        warnings.append(f"x tick candidates {len(ticks.get('x', []))}/{int(x_tick_count)}")
+    if len(ticks.get("y", [])) < int(y_tick_count):
+        warnings.append(f"y tick candidates {len(ticks.get('y', []))}/{int(y_tick_count)}")
+    return score, warnings
+
+
+def score_plot_area_candidate(image, candidate, labels, tick_params=None, x_tick_count=None, y_tick_count=None):
+    plot_area = candidate["plot_area"]
+    height, width = image.shape[:2]
+    warnings = []
+    score = 20.0
+    area_width = plot_area["right"] - plot_area["left"]
+    area_height = plot_area["bottom"] - plot_area["top"]
+    width_ratio = area_width / max(1.0, float(width))
+    height_ratio = area_height / max(1.0, float(height))
+    if 0.45 <= width_ratio <= 0.94:
+        score += 10.0
+    else:
+        warnings.append(f"width ratio {width_ratio:.2f}")
+    if 0.45 <= height_ratio <= 0.92:
+        score += 10.0
+    else:
+        warnings.append(f"height ratio {height_ratio:.2f}")
+    border_score = border_strength(image, plot_area)
+    score += min(22.0, border_score * 0.32)
+    if border_score < 20.0:
+        warnings.append(f"weak border {border_score:.1f}")
+    label_score, label_warnings = label_alignment_score(plot_area, labels, x_tick_count, y_tick_count)
+    score += label_score
+    warnings.extend(label_warnings)
+    tick_score, tick_warnings = tick_consistency_score(image, plot_area, tick_params, x_tick_count, y_tick_count)
+    score += tick_score
+    warnings.extend(tick_warnings)
+    if candidate["source"] == "tick-label":
+        score += 8.0
+    score = round(max(0.0, min(100.0, score)), 1)
+    status = "pass" if score >= 80.0 else "review" if score >= 55.0 else "fail"
+    return {
+        "plot_area": plot_area,
+        "source": candidate["source"],
+        "score": score,
+        "status": status,
+        "warnings": warnings,
+        "details": candidate.get("details", {}),
+    }
+
+
+def detect_plot_area_candidates(image, x_tick_count=None, y_tick_count=None, tick_params=None):
+    candidates = []
+    labels = detect_global_tick_labels(image, x_tick_count, y_tick_count)
+    add_plot_area_candidate(candidates, image, ld.auto_detect_plot_area(image), "hough")
+    add_plot_area_candidate(candidates, image, projection_plot_area_candidate(image), "projection")
+    add_plot_area_candidate(candidates, image, contour_plot_area_candidate(image), "contour")
+    add_plot_area_candidate(candidates, image, label_first_plot_area_candidate(image, labels), "tick-label")
+    if not candidates:
+        add_plot_area_candidate(candidates, image, ld.default_plot_area(image), "default")
+
+    scored = [
+        score_plot_area_candidate(image, candidate, labels, tick_params, x_tick_count, y_tick_count)
+        for candidate in candidates
+    ]
+    scored = sorted(scored, key=lambda item: float(item["score"]), reverse=True)
+    best = scored[0]
+    detection = {
+        "status": best["status"],
+        "score": best["score"],
+        "source": best["source"],
+        "warnings": best["warnings"],
+        "candidates": scored,
+        "x_labels": labels.get("x", {}),
+        "y_labels": labels.get("y", {}),
+        "ocr_available": labels.get("available", False),
+    }
+    return best["plot_area"], detection
+
+
 def apply_y_label_assisted_calibration(image, config, y_tick_count):
     label_rows = detect_y_label_rows(image, config["plot_area"], int(y_tick_count))
     config["y_label_rows"] = label_rows
@@ -957,12 +1418,17 @@ def refresh_calibration_qc(config, x_tick_count, y_tick_count):
     if qc["y_label_assisted"]:
         qc.setdefault("warnings", []).append("y: calibrated from detected tick label rows")
     verification = config.get("calibration_verification", {})
+    plot_verification = config.get("plot_area_verification", {})
     qc["auto_status"] = qc.get("status", "fail")
     qc["verified"] = bool(verification.get("verified"))
     qc["verified_at"] = verification.get("verified_at")
     qc["verified_note"] = verification.get("note", "")
-    qc["usable"] = bool(qc["verified"])
-    if qc["verified"]:
+    qc["plot_area_verified"] = bool(plot_verification.get("verified"))
+    qc["plot_area_verified_at"] = plot_verification.get("verified_at")
+    qc["plot_area_status"] = config.get("plot_area_detection", {}).get("status", "")
+    qc["plot_area_score"] = config.get("plot_area_detection", {}).get("score", "")
+    qc["usable"] = bool(qc["verified"] and qc["plot_area_verified"])
+    if qc["usable"]:
         qc["status"] = "verified"
     elif qc["auto_status"] == "fail":
         qc["status"] = "fail"
@@ -978,6 +1444,25 @@ def clear_calibration_verification(config):
         config["calibration_qc"]["verified"] = False
         config["calibration_qc"]["usable"] = False
         config["calibration_qc"]["status"] = "needs_verification"
+    return config
+
+
+def clear_plot_area_verification(config):
+    config["plot_area_verification"] = {"verified": False}
+    clear_calibration_verification(config)
+    return config
+
+
+def is_plot_area_verified(config):
+    return bool(config.get("plot_area_verification", {}).get("verified"))
+
+
+def confirm_plot_area(config, method="user"):
+    config["plot_area_verification"] = {
+        "verified": True,
+        "verified_at": datetime.now().isoformat(timespec="seconds"),
+        "method": method,
+    }
     return config
 
 
@@ -1029,6 +1514,8 @@ def auto_calibrate_config(
 
 def qc_summary_row(image_path, config, paths, point_count=None, error=None):
     qc = config.get("calibration_qc", {})
+    plot_detection = config.get("plot_area_detection", {})
+    plot_verification = config.get("plot_area_verification", {})
     x_qc = qc.get("x", {})
     y_qc = qc.get("y", {})
     max_residuals = [
@@ -1046,6 +1533,10 @@ def qc_summary_row(image_path, config, paths, point_count=None, error=None):
         "verified": bool(qc.get("verified", False)),
         "usable": bool(qc.get("usable", False)) and not bool(error),
         "verified_at": qc.get("verified_at", ""),
+        "plot_area_verified": bool(plot_verification.get("verified", qc.get("plot_area_verified", False))),
+        "plot_area_status": plot_detection.get("status", qc.get("plot_area_status", "")),
+        "plot_area_score": plot_detection.get("score", qc.get("plot_area_score", "")),
+        "plot_area_warnings": summarize_qc_warnings(plot_detection, limit=4),
         "y_label_assisted": bool(qc.get("y_label_assisted", False)),
         "score": qc.get("score", 0),
         "x_tick_count": x_qc.get("used_count", 0),
@@ -1070,6 +1561,10 @@ def write_batch_qc(output_root, rows):
         "verified",
         "usable",
         "verified_at",
+        "plot_area_verified",
+        "plot_area_status",
+        "plot_area_score",
+        "plot_area_warnings",
         "y_label_assisted",
         "score",
         "x_tick_count",
@@ -1111,6 +1606,13 @@ def filter_images_by_qc(images, qc_frame, mode):
         return [path for path in images if str(rows_by_image.get(path.name, {}).get("usable", "")).lower() in ("true", "1")]
     if mode == "Auto failed":
         return [path for path in images if str(rows_by_image.get(path.name, {}).get("auto_status", "")).lower() == "fail"]
+    if mode == "Plot area needs review":
+        return [
+            path
+            for path in images
+            if str(rows_by_image.get(path.name, {}).get("plot_area_verified", "")).lower() not in ("true", "1")
+            or str(rows_by_image.get(path.name, {}).get("plot_area_status", "")).lower() in ("fail", "review")
+        ]
     if mode == "Needs verification":
         return [
             path
@@ -1148,6 +1650,16 @@ def process_image_auto(
     config = load_or_create_config(image_path, paths, x_min, x_max, y_min, y_max, x_step, base_series_frame)
     image = ld.load_image(image_path)
     config["plot_area"] = ld.normalize_plot_area(config.get("plot_area") or ld.default_plot_area(image), image)
+    if is_new_config or not config.get("plot_area_detection"):
+        config["plot_area"], config["plot_area_detection"] = detect_plot_area_candidates(
+            image,
+            int(x_tick_count),
+            int(y_tick_count),
+            tick_params,
+        )
+        config["plot_area"] = ld.normalize_plot_area(config["plot_area"], image)
+        config["plot_area_verification"] = {"verified": False}
+    config.setdefault("plot_area_verification", {"verified": False})
     config = sync_axis_settings(config, x_min, x_max, y_min, y_max, x_step)
     config = ensure_detected_series_for_new_config(image, config, is_new_config)
     config = auto_calibrate_config(
@@ -1663,8 +2175,20 @@ def render_image(path, caption):
         st.image(str(path), caption=caption, use_container_width=True)
 
 
-def build_plot_area_preview_image(image, plot_area):
+def build_plot_area_preview_image(image, plot_area, detection=None, pending_plot_area=None):
     preview = image.copy()
+    detection = detection or {}
+    for candidate in detection.get("candidates", [])[1:4]:
+        candidate_area = candidate.get("plot_area")
+        if not candidate_area:
+            continue
+        cv2.rectangle(
+            preview,
+            (int(candidate_area["left"]), int(candidate_area["top"])),
+            (int(candidate_area["right"]), int(candidate_area["bottom"])),
+            (175, 175, 175),
+            1,
+        )
     cv2.rectangle(
         preview,
         (plot_area["left"], plot_area["top"]),
@@ -1672,6 +2196,22 @@ def build_plot_area_preview_image(image, plot_area):
         (0, 180, 255),
         2,
     )
+    if pending_plot_area:
+        cv2.rectangle(
+            preview,
+            (pending_plot_area["left"], pending_plot_area["top"]),
+            (pending_plot_area["right"], pending_plot_area["bottom"]),
+            (255, 80, 0),
+            2,
+        )
+    for item in detection.get("x_labels", {}).get("numbers", []):
+        cv2.circle(preview, (int(round(item["center_x"])), int(round(item["center_y"]))), 5, (255, 90, 0), -1)
+    for item in detection.get("y_labels", {}).get("numbers", []):
+        cv2.circle(preview, (int(round(item["center_x"])), int(round(item["center_y"]))), 5, (0, 170, 0), -1)
+    if detection:
+        label = f"PLOT {str(detection.get('status', 'unknown')).upper()} score={detection.get('score', '')} {detection.get('source', '')}"
+        cv2.rectangle(preview, (8, 8), (min(image.shape[1] - 8, 430), 42), (0, 130, 180), -1)
+        cv2.putText(preview, label[:58], (18, 31), cv2.FONT_HERSHEY_SIMPLEX, 0.58, (255, 255, 255), 2)
     return preview
 
 
@@ -1719,7 +2259,16 @@ def shift_axis_calibration(config, axis_name, delta_px, clear_verification_state
     return config
 
 
-def render_overlay_viewer(image, config, paths, overlay_mode_key, axis_key, editor_version_key, pending_shift=None):
+def render_overlay_viewer(
+    image,
+    config,
+    paths,
+    overlay_mode_key,
+    axis_key,
+    editor_version_key,
+    pending_shift=None,
+    pending_plot_area=None,
+):
     modes = ["Plot area", "Ticks", "Points"]
     request_key = f"{overlay_mode_key}_request"
     if st.session_state.get(request_key) in modes:
@@ -1738,8 +2287,17 @@ def render_overlay_viewer(image, config, paths, overlay_mode_key, axis_key, edit
     drag_event = None
 
     if mode == "Plot area":
-        preview = build_plot_area_preview_image(image, config["plot_area"])
-        st.image(bgr_to_rgb(preview), caption="Plot area", use_container_width=True)
+        preview = build_plot_area_preview_image(
+            image,
+            config["plot_area"],
+            config.get("plot_area_detection"),
+            pending_plot_area=pending_plot_area,
+        )
+        drag_event = streamlit_image_coordinates(
+            bgr_to_rgb(preview),
+            use_column_width="always",
+            key=f"plot_area_viewer_{axis_key}_{st.session_state[editor_version_key]}_{plot_area_signature(pending_plot_area) if pending_plot_area else 'none'}",
+        )
     elif mode == "Points":
         if paths["preview"].exists():
             render_image(paths["preview"], "Extracted point overlay")
@@ -1844,6 +2402,191 @@ def render_tick_adjuster(
     return config
 
 
+def pending_plot_area_from_corners(corners, image):
+    if len(corners) < 2:
+        return None
+    x1, y1 = int(corners[0]["x"]), int(corners[0]["y"])
+    x2, y2 = int(corners[1]["x"]), int(corners[1]["y"])
+    return ld.normalize_plot_area(
+        {
+            "left": min(x1, x2),
+            "right": max(x1, x2),
+            "top": min(y1, y2),
+            "bottom": max(y1, y2),
+        },
+        image,
+    )
+
+
+def render_plot_area_controls(
+    image,
+    config,
+    paths,
+    axis_key,
+    editor_version_key,
+    overlay_mode_key,
+    status_key,
+    plot_click_event,
+    x_min,
+    x_max,
+    y_min,
+    y_max,
+    csv_x_interval,
+    x_tick_count,
+    y_tick_count,
+    tick_params,
+):
+    st.subheader("Plot area")
+    detection = config.get("plot_area_detection", {})
+    verify = config.get("plot_area_verification", {})
+    status_text = str(detection.get("status", "unknown")).upper()
+    verify_text = "verified" if verify.get("verified") else "not verified"
+    st.caption(
+        f"Auto plot area: {status_text} score={detection.get('score', '')} source={detection.get('source', '')}; {verify_text}"
+    )
+
+    controls = st.columns([1.25, 1.0, 1.0])
+    if controls[0].button("Re-detect plot area", use_container_width=True):
+        config["plot_area"], config["plot_area_detection"] = detect_plot_area_candidates(
+            image,
+            int(x_tick_count),
+            int(y_tick_count),
+            tick_params,
+        )
+        config["plot_area"] = ld.normalize_plot_area(config["plot_area"], image)
+        clear_plot_area_verification(config)
+        config = sync_axis_settings(config, x_min, x_max, y_min, y_max, csv_x_interval)
+        refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
+        draw_config_tick_preview(image, config, paths)
+        save_config(config, paths["config"])
+        st.session_state[editor_version_key] += 1
+        request_overlay_mode(overlay_mode_key, "Plot area")
+        st.session_state[status_key] = (
+            f"Plot area updated from {config['plot_area_detection'].get('source', 'auto')} "
+            f"score={config['plot_area_detection'].get('score', '')}."
+        )
+        st.rerun()
+
+    if controls[1].button("Confirm plot area", use_container_width=True):
+        confirm_plot_area(config, method="user-confirmed-overlay")
+        refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
+        save_config(config, paths["config"])
+        st.session_state[editor_version_key] += 1
+        request_overlay_mode(overlay_mode_key, "Plot area")
+        st.session_state[status_key] = "Plot area confirmed."
+        st.rerun()
+
+    if controls[2].button("Clear plot confirmation", use_container_width=True, disabled=not verify.get("verified")):
+        clear_plot_area_verification(config)
+        refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
+        save_config(config, paths["config"])
+        st.session_state[editor_version_key] += 1
+        request_overlay_mode(overlay_mode_key, "Plot area")
+        st.session_state[status_key] = "Plot area confirmation cleared."
+        st.rerun()
+
+    redraw_key = f"plot_redraw_enabled_{axis_key}"
+    corners_key = f"plot_corner_picks_{axis_key}"
+    click_time_key = f"plot_corner_click_time_{axis_key}"
+    st.session_state.setdefault(corners_key, [])
+    st.session_state.setdefault(click_time_key, None)
+    redraw_enabled = st.checkbox("Redraw by two corners", value=False, key=redraw_key)
+
+    if redraw_enabled:
+        image_pixel = click_to_image_pixel(plot_click_event, image)
+        if image_pixel and image_pixel.get("unix_time") != st.session_state[click_time_key]:
+            st.session_state[click_time_key] = image_pixel.get("unix_time")
+            corners = st.session_state[corners_key]
+            if len(corners) >= 2:
+                corners = []
+            corners.append({"x": int(image_pixel["x"]), "y": int(image_pixel["y"])})
+            st.session_state[corners_key] = corners
+            request_overlay_mode(overlay_mode_key, "Plot area")
+            st.rerun()
+
+    corners = st.session_state.get(corners_key, [])
+    if redraw_enabled:
+        st.write(f"Picked {len(corners)} / 2 corners.")
+        if corners:
+            st.dataframe(
+                pd.DataFrame(
+                    {
+                        "corner": ["first", "second"][: len(corners)],
+                        "x": [item["x"] for item in corners],
+                        "y": [item["y"] for item in corners],
+                    }
+                ),
+                use_container_width=True,
+                hide_index=True,
+            )
+        pending = pending_plot_area_from_corners(corners, image)
+        action_cols = st.columns(3)
+        if action_cols[0].button("Apply plot area", use_container_width=True, disabled=pending is None):
+            config["plot_area"] = pending
+            config["plot_area_detection"] = {
+                "status": "review",
+                "score": "",
+                "source": "manual-two-corners",
+                "warnings": ["manual plot area needs confirmation"],
+                "candidates": [],
+                "x_labels": config.get("plot_area_detection", {}).get("x_labels", {}),
+                "y_labels": config.get("plot_area_detection", {}).get("y_labels", {}),
+            }
+            clear_plot_area_verification(config)
+            config = sync_axis_settings(config, x_min, x_max, y_min, y_max, csv_x_interval)
+            refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
+            draw_config_tick_preview(image, config, paths)
+            save_config(config, paths["config"])
+            st.session_state[corners_key] = []
+            st.session_state[editor_version_key] += 1
+            request_overlay_mode(overlay_mode_key, "Plot area")
+            st.session_state[status_key] = "Applied manually redrawn plot area. Confirm it before extracting CSV."
+            st.rerun()
+        if action_cols[1].button("Undo corner", use_container_width=True, disabled=not corners):
+            st.session_state[corners_key] = corners[:-1]
+            request_overlay_mode(overlay_mode_key, "Plot area")
+            st.rerun()
+        if action_cols[2].button("Clear corners", use_container_width=True, disabled=not corners):
+            st.session_state[corners_key] = []
+            request_overlay_mode(overlay_mode_key, "Plot area")
+            st.rerun()
+
+    if detection:
+        with st.expander("Plot area QC details"):
+            rows = []
+            for item in detection.get("candidates", []):
+                pa = item.get("plot_area", {})
+                rows.append(
+                    {
+                        "source": item.get("source"),
+                        "status": item.get("status"),
+                        "score": item.get("score"),
+                        "left": pa.get("left"),
+                        "right": pa.get("right"),
+                        "top": pa.get("top"),
+                        "bottom": pa.get("bottom"),
+                        "warnings": "; ".join(item.get("warnings", [])[:4]),
+                    }
+                )
+            if rows:
+                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            label_rows = []
+            for axis_name in ("x", "y"):
+                labels = detection.get(f"{axis_name}_labels", {})
+                label_rows.append(
+                    {
+                        "axis": axis_name,
+                        "status": labels.get("status"),
+                        "count": labels.get("count", 0),
+                        "min": labels.get("min"),
+                        "max": labels.get("max"),
+                        "warnings": "; ".join(labels.get("warnings", [])[:4]),
+                    }
+                )
+            st.dataframe(pd.DataFrame(label_rows), use_container_width=True, hide_index=True)
+    return config
+
+
 def confirm_ticks_and_preview(image_path, image, config, paths, x_tick_count, y_tick_count):
     clear_calibration_verification(config)
     refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
@@ -1875,14 +2618,21 @@ def main():
         )
         all_images = list_images(image_dir)
         qc_frame = read_batch_qc(output_dir)
-        qc_filter = st.selectbox("QC filter", ["All", "Needs verification", "Verified", "Auto failed"], index=0)
+        qc_filter = st.selectbox(
+            "QC filter",
+            ["All", "Plot area needs review", "Needs verification", "Verified", "Auto failed"],
+            index=0,
+        )
         if not qc_frame.empty:
             usable_source = qc_frame["usable"] if "usable" in qc_frame else pd.Series([False] * len(qc_frame))
             auto_status_source = qc_frame["auto_status"] if "auto_status" in qc_frame else qc_frame.get("status", pd.Series([""] * len(qc_frame)))
+            plot_verified_source = qc_frame["plot_area_verified"] if "plot_area_verified" in qc_frame else pd.Series([False] * len(qc_frame))
             usable = usable_source.fillna(False).astype(str).str.lower().isin(("true", "1"))
             auto_failed = auto_status_source.fillna("").astype(str).str.lower().eq("fail")
+            plot_verified = plot_verified_source.fillna(False).astype(str).str.lower().isin(("true", "1"))
             st.caption(
-                f"QC: verified {int(usable.sum())}, needs verification {int((~usable).sum())}, auto failed {int(auto_failed.sum())}"
+                f"QC: verified {int(usable.sum())}, plot area unverified {int((~plot_verified).sum())}, "
+                f"needs verification {int((~usable).sum())}, auto failed {int(auto_failed.sum())}"
             )
         images = filter_images_by_qc(all_images, qc_frame, qc_filter)
         if not images:
@@ -2065,6 +2815,7 @@ def main():
     overlay_mode_key = f"overlay_mode_{image_path.name}"
     pending_shift_key = f"pending_tick_shift_{image_path.name}"
     movement_history_key = f"tick_movement_history_{image_path.name}"
+    plot_corners_key = f"plot_corner_picks_{axis_key}"
     status_key = f"status_{image_path.name}"
     last_extract_key = f"last_extract_{image_path.name}"
     st.session_state.setdefault(editor_version_key, 0)
@@ -2074,9 +2825,10 @@ def main():
 
     st.subheader(image_path.name)
     st.caption(f"Image {st.session_state.image_index + 1} / {len(images)}")
+    pending_plot_area = pending_plot_area_from_corners(st.session_state.get(plot_corners_key, []), image)
     canvas_cols = st.columns([0.125, 0.75, 0.125])
     with canvas_cols[1]:
-        overlay_mode, drag_event = render_overlay_viewer(
+        overlay_mode, viewer_event = render_overlay_viewer(
             image,
             config,
             paths,
@@ -2084,6 +2836,7 @@ def main():
             axis_key,
             editor_version_key,
             pending_shift=st.session_state.get(pending_shift_key),
+            pending_plot_area=pending_plot_area,
         )
 
     with st.container():
@@ -2147,20 +2900,23 @@ def main():
             st.rerun()
 
         if main_cols[2].button("Confirm ticks + preview CSV", use_container_width=True):
-            try:
-                rows = confirm_ticks_and_preview(image_path, image, config, paths, int(x_tick_count), int(y_tick_count))
-            except Exception as exc:
-                clear_calibration_verification(config)
-                refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
-                draw_config_tick_preview(image, config, paths)
-                save_config(config, paths["config"])
-                st.error(f"Extraction failed: {exc}")
+            if not is_plot_area_verified(config):
+                st.error("Confirm plot area first. The CSV will not be marked usable until the plot area is reviewed.")
             else:
-                st.session_state[last_extract_key] = len(rows)
-                st.session_state[editor_version_key] += 1
-                request_overlay_mode(overlay_mode_key, "Points")
-                st.session_state[status_key] = f"Verified ticks and extracted {len(rows)} points."
-                st.rerun()
+                try:
+                    rows = confirm_ticks_and_preview(image_path, image, config, paths, int(x_tick_count), int(y_tick_count))
+                except Exception as exc:
+                    clear_calibration_verification(config)
+                    refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
+                    draw_config_tick_preview(image, config, paths)
+                    save_config(config, paths["config"])
+                    st.error(f"Extraction failed: {exc}")
+                else:
+                    st.session_state[last_extract_key] = len(rows)
+                    st.session_state[editor_version_key] += 1
+                    request_overlay_mode(overlay_mode_key, "Points")
+                    st.session_state[status_key] = f"Verified plot area and ticks, extracted {len(rows)} points."
+                    st.rerun()
 
         if main_cols[3].button("Next", use_container_width=True, disabled=st.session_state.image_index >= len(images) - 1):
             st.session_state.image_index += 1
@@ -2168,18 +2924,24 @@ def main():
             st.rerun()
 
         if overlay_mode == "Plot area":
-            if st.button("Re-detect plot area", use_container_width=True):
-                config["plot_area"] = ld.auto_detect_plot_area(image) or ld.default_plot_area(image)
-                config["plot_area"] = ld.normalize_plot_area(config["plot_area"], image)
-                clear_calibration_verification(config)
-                config = sync_axis_settings(config, x_min, x_max, y_min, y_max, csv_x_interval)
-                refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
-                draw_config_tick_preview(image, config, paths)
-                save_config(config, paths["config"])
-                st.session_state[editor_version_key] += 1
-                request_overlay_mode(overlay_mode_key, "Plot area")
-                st.session_state[status_key] = "Plot area updated."
-                st.rerun()
+            config = render_plot_area_controls(
+                image,
+                config,
+                paths,
+                axis_key,
+                editor_version_key,
+                overlay_mode_key,
+                status_key,
+                viewer_event,
+                x_min,
+                x_max,
+                y_min,
+                y_max,
+                csv_x_interval,
+                int(x_tick_count),
+                int(y_tick_count),
+                tick_params,
+            )
 
         if overlay_mode == "Ticks":
             config = render_tick_adjuster(
@@ -2191,7 +2953,7 @@ def main():
                 overlay_mode_key,
                 pending_shift_key,
                 movement_history_key,
-                drag_event,
+                viewer_event,
                 status_key,
                 int(x_tick_count),
                 int(y_tick_count),
@@ -2240,7 +3002,14 @@ def main():
                 new_plot_area = ld.normalize_plot_area(pa, image)
                 if new_plot_area != old_pa:
                     config["plot_area"] = new_plot_area
-                    clear_calibration_verification(config)
+                    config["plot_area_detection"] = {
+                        "status": "review",
+                        "score": "",
+                        "source": "manual-pixel-crop",
+                        "warnings": ["manual plot area needs confirmation"],
+                        "candidates": [],
+                    }
+                    clear_plot_area_verification(config)
                     config = sync_axis_settings(config, x_min, x_max, y_min, y_max, csv_x_interval)
                     refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
                     draw_config_tick_preview(image, config, paths)
@@ -2382,12 +3151,15 @@ def main():
 
         st.subheader("QC")
         qc = config.get("calibration_qc") or refresh_calibration_qc(config, int(x_tick_count), int(y_tick_count))
-        metric_cols = st.columns(3)
+        metric_cols = st.columns(4)
         metric_cols[0].metric("Status", str(qc.get("status", "unknown")).upper())
         metric_cols[1].metric("Auto status", str(qc.get("auto_status", qc.get("status", "unknown"))).upper())
         metric_cols[2].metric("Auto score", qc.get("score", 0))
+        metric_cols[3].metric("Plot score", config.get("plot_area_detection", {}).get("score", ""))
         if st.session_state.get(last_extract_key) is not None:
             st.success(f"Last extraction: {st.session_state[last_extract_key]} points.")
+        elif not is_plot_area_verified(config):
+            st.warning("Not usable yet: confirm plot area first, then confirm ticks.")
         elif not qc.get("usable"):
             st.warning("Not usable yet: confirm ticks to generate the CSV preview.")
         else:
