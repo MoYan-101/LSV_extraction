@@ -1,0 +1,473 @@
+{
+  "plot_area": {
+    "left": 119,
+    "right": 804,
+    "top": 11,
+    "bottom": 474
+  },
+  "axes": {
+    "x": {
+      "min": 1.0,
+      "max": 2.0,
+      "scale": "linear",
+      "pixel_min": 119,
+      "pixel_max": 804,
+      "calibration": [
+        {
+          "pixel": 127,
+          "value": 1.0
+        },
+        {
+          "pixel": 263,
+          "value": 1.2
+        },
+        {
+          "pixel": 388,
+          "value": 1.4
+        },
+        {
+          "pixel": 539,
+          "value": 1.6
+        },
+        {
+          "pixel": 668,
+          "value": 1.8
+        },
+        {
+          "pixel": 804,
+          "value": 2.0
+        }
+      ]
+    },
+    "y": {
+      "min": 0.0,
+      "max": 24.0,
+      "scale": "linear",
+      "pixel_min": 474,
+      "pixel_max": 11,
+      "calibration": [
+        {
+          "pixel": 455,
+          "value": 0.0
+        },
+        {
+          "pixel": 381,
+          "value": 4.0
+        },
+        {
+          "pixel": 307,
+          "value": 8.0
+        },
+        {
+          "pixel": 234,
+          "value": 12.0
+        },
+        {
+          "pixel": 161,
+          "value": 16.0
+        },
+        {
+          "pixel": 87,
+          "value": 20.0
+        },
+        {
+          "pixel": 13,
+          "value": 24.0
+        }
+      ]
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "selected": true,
+      "name": "color_1",
+      "rgb": [
+        3,
+        3,
+        3
+      ],
+      "tolerance": 30,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    }
+  ],
+  "output": {
+    "x_step": null,
+    "max_interpolate_gap_px": 8
+  },
+  "calibration_verification": {
+    "verified": false
+  },
+  "detected_ticks": {
+    "x": [
+      {
+        "pixel": 127,
+        "strength": 39,
+        "width_px": 15
+      },
+      {
+        "pixel": 144,
+        "strength": 32,
+        "width_px": 15
+      },
+      {
+        "pixel": 156,
+        "strength": 21,
+        "width_px": 5
+      },
+      {
+        "pixel": 166,
+        "strength": 22,
+        "width_px": 5
+      },
+      {
+        "pixel": 174,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 183,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 191,
+        "strength": 21,
+        "width_px": 5
+      },
+      {
+        "pixel": 201,
+        "strength": 20,
+        "width_px": 5
+      },
+      {
+        "pixel": 211,
+        "strength": 32,
+        "width_px": 10
+      },
+      {
+        "pixel": 219,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 263,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 272,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 280,
+        "strength": 19,
+        "width_px": 5
+      },
+      {
+        "pixel": 290,
+        "strength": 19,
+        "width_px": 4
+      },
+      {
+        "pixel": 298,
+        "strength": 20,
+        "width_px": 5
+      },
+      {
+        "pixel": 308,
+        "strength": 19,
+        "width_px": 4
+      },
+      {
+        "pixel": 320,
+        "strength": 28,
+        "width_px": 12
+      },
+      {
+        "pixel": 335,
+        "strength": 18,
+        "width_px": 3
+      },
+      {
+        "pixel": 388,
+        "strength": 18,
+        "width_px": 1
+      },
+      {
+        "pixel": 428,
+        "strength": 27,
+        "width_px": 11
+      },
+      {
+        "pixel": 453,
+        "strength": 32,
+        "width_px": 13
+      },
+      {
+        "pixel": 473,
+        "strength": 20,
+        "width_px": 6
+      },
+      {
+        "pixel": 539,
+        "strength": 20,
+        "width_px": 6
+      },
+      {
+        "pixel": 559,
+        "strength": 31,
+        "width_px": 8
+      },
+      {
+        "pixel": 583,
+        "strength": 20,
+        "width_px": 3
+      },
+      {
+        "pixel": 648,
+        "strength": 20,
+        "width_px": 6
+      },
+      {
+        "pixel": 668,
+        "strength": 30,
+        "width_px": 7
+      },
+      {
+        "pixel": 675,
+        "strength": 18,
+        "width_px": 1
+      },
+      {
+        "pixel": 685,
+        "strength": 20,
+        "width_px": 3
+      },
+      {
+        "pixel": 691,
+        "strength": 20,
+        "width_px": 3
+      },
+      {
+        "pixel": 757,
+        "strength": 20,
+        "width_px": 6
+      },
+      {
+        "pixel": 777,
+        "strength": 42,
+        "width_px": 8
+      },
+      {
+        "pixel": 799,
+        "strength": 49,
+        "width_px": 14
+      },
+      {
+        "pixel": 804,
+        "strength": 49,
+        "width_px": 1
+      }
+    ],
+    "y": [
+      {
+        "pixel": 470,
+        "strength": 25,
+        "width_px": 8
+      },
+      {
+        "pixel": 381,
+        "strength": 32,
+        "width_px": 22
+      },
+      {
+        "pixel": 307,
+        "strength": 28,
+        "width_px": 23
+      },
+      {
+        "pixel": 234,
+        "strength": 32,
+        "width_px": 22
+      },
+      {
+        "pixel": 160,
+        "strength": 28,
+        "width_px": 22
+      },
+      {
+        "pixel": 86,
+        "strength": 32,
+        "width_px": 23
+      },
+      {
+        "pixel": 16,
+        "strength": 38,
+        "width_px": 13
+      }
+    ]
+  },
+  "tick_detection": {
+    "params": {
+      "search_px": 24,
+      "dark_threshold": 210,
+      "min_tick_len": 3,
+      "max_cluster_width": 28
+    },
+    "score": 13.482857142857126,
+    "x_candidates": 34,
+    "y_candidates": 7,
+    "y_label_assisted": true,
+    "y_label_rows": 7
+  },
+  "y_label_rows": [
+    {
+      "pixel": 455,
+      "strength": 222,
+      "width_px": 14,
+      "source": "label"
+    },
+    {
+      "pixel": 381,
+      "strength": 216,
+      "width_px": 15,
+      "source": "label"
+    },
+    {
+      "pixel": 307,
+      "strength": 361,
+      "width_px": 14,
+      "source": "label"
+    },
+    {
+      "pixel": 234,
+      "strength": 351,
+      "width_px": 15,
+      "source": "label"
+    },
+    {
+      "pixel": 161,
+      "strength": 439,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 87,
+      "strength": 412,
+      "width_px": 15,
+      "source": "label"
+    },
+    {
+      "pixel": 13,
+      "strength": 419,
+      "width_px": 31,
+      "source": "label"
+    }
+  ],
+  "calibration_qc": {
+    "status": "needs_verification",
+    "score": 72.0,
+    "warnings": [
+      "x: tick residual 9.8px > 3px",
+      "y: calibrated from detected tick label rows"
+    ],
+    "x": {
+      "expected_count": 6,
+      "used_count": 6,
+      "used_pixels": [
+        127,
+        263,
+        388,
+        539,
+        668,
+        804
+      ],
+      "max_residual_px": 8.935452185504044,
+      "max_spacing_residual_px": 9.800000000000011,
+      "coverage": 0.9883211678832117,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.5986394557823129,
+      "score": 72.0,
+      "status": "review",
+      "warnings": [
+        "tick residual 9.8px > 3px"
+      ]
+    },
+    "y": {
+      "expected_count": 7,
+      "used_count": 7,
+      "used_pixels": [
+        455,
+        381,
+        307,
+        234,
+        161,
+        87,
+        13
+      ],
+      "max_residual_px": 0.5718446601942343,
+      "max_spacing_residual_px": 0.6666666666666856,
+      "coverage": 0.9546436285097192,
+      "candidate_match_ratio": 0.8571428571428571,
+      "mean_strength_ratio": 0.8333333333333334,
+      "score": 97.3,
+      "status": "pass",
+      "warnings": []
+    },
+    "y_label_rows": [
+      {
+        "pixel": 455,
+        "strength": 222,
+        "width_px": 14,
+        "source": "label"
+      },
+      {
+        "pixel": 381,
+        "strength": 216,
+        "width_px": 15,
+        "source": "label"
+      },
+      {
+        "pixel": 307,
+        "strength": 361,
+        "width_px": 14,
+        "source": "label"
+      },
+      {
+        "pixel": 234,
+        "strength": 351,
+        "width_px": 15,
+        "source": "label"
+      },
+      {
+        "pixel": 161,
+        "strength": 439,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 87,
+        "strength": 412,
+        "width_px": 15,
+        "source": "label"
+      },
+      {
+        "pixel": 13,
+        "strength": 419,
+        "width_px": 31,
+        "source": "label"
+      }
+    ],
+    "y_label_assisted": true,
+    "auto_status": "review",
+    "verified": false,
+    "verified_at": null,
+    "verified_note": "",
+    "usable": false
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "plot_area": {
+    "left": 147,
+    "right": 1082,
+    "top": 87,
+    "bottom": 792
+  },
+  "axes": {
+    "x": {
+      "min": 1.2,
+      "max": 1.8,
+      "scale": "linear",
+      "pixel_min": 147,
+      "pixel_max": 1082,
+      "calibration": [
+        {
+          "pixel": 150,
+          "value": 1.2
+        },
+        {
+          "pixel": 459,
+          "value": 1.4
+        },
+        {
+          "pixel": 770,
+          "value": 1.6
+        },
+        {
+          "pixel": 1080,
+          "value": 1.8
+        }
+      ]
+    },
+    "y": {
+      "min": -2.0,
+      "max": 50.0,
+      "scale": "linear",
+      "pixel_min": 792,
+      "pixel_max": 87,
+      "calibration": [
+        {
+          "pixel": 760,
+          "value": 0
+        },
+        {
+          "pixel": 628,
+          "value": 10
+        },
+        {
+          "pixel": 493,
+          "value": 20
+        },
+        {
+          "pixel": 359,
+          "value": 30
+        },
+        {
+          "pixel": 224,
+          "value": 40
+        },
+        {
+          "pixel": 90,
+          "value": 50
+        }
+      ]
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "name": "blue",
+      "rgb": [
+        35,
+        45,
+        220
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "name": "red",
+      "rgb": [
+        220,
+        35,
+        55
+      ],
+      "tolerance": 42.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "name": "black",
+      "rgb": [
+        30,
+        30,
+        30
+      ],
+      "tolerance": 30.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    }
+  ],
+  "output": {
+    "x_step": 0.01,
+    "max_interpolate_gap_px": 8
+  },
+  "detected_ticks": {
+    "x": [
+      {
+        "pixel": 150,
+        "strength": 28,
+        "width_px": 5
+      },
+      {
+        "pixel": 459,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 770,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 1080,
+        "strength": 28,
+        "width_px": 5
+      }
+    ],
+    "y": [
+      {
+        "pixel": 790,
+        "strength": 18,
+        "width_px": 5
+      },
+      {
+        "pixel": 760,
+        "strength": 27,
+        "width_px": 12
+      },
+      {
+        "pixel": 628,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 493,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 359,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 224,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 90,
+        "strength": 27,
+        "width_px": 5
+      }
+    ]
+  }
+}

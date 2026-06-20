@@ -1,0 +1,521 @@
+{
+  "plot_area": {
+    "left": 103,
+    "right": 683,
+    "top": 4,
+    "bottom": 489
+  },
+  "axes": {
+    "x": {
+      "min": 1.0,
+      "max": 2.0,
+      "scale": "linear",
+      "pixel_min": 103,
+      "pixel_max": 683,
+      "calibration": [
+        {
+          "pixel": 104,
+          "value": 1.0
+        },
+        {
+          "pixel": 220,
+          "value": 1.2
+        },
+        {
+          "pixel": 335,
+          "value": 1.4
+        },
+        {
+          "pixel": 450,
+          "value": 1.6
+        },
+        {
+          "pixel": 566,
+          "value": 1.8
+        },
+        {
+          "pixel": 682,
+          "value": 2.0
+        }
+      ]
+    },
+    "y": {
+      "min": 0.0,
+      "max": 24.0,
+      "scale": "linear",
+      "pixel_min": 489,
+      "pixel_max": 4,
+      "calibration": [
+        {
+          "pixel": 477,
+          "value": 0.0
+        },
+        {
+          "pixel": 402,
+          "value": 4.0
+        },
+        {
+          "pixel": 326,
+          "value": 8.0
+        },
+        {
+          "pixel": 250,
+          "value": 12.0
+        },
+        {
+          "pixel": 174,
+          "value": 16.0
+        },
+        {
+          "pixel": 99,
+          "value": 20.0
+        },
+        {
+          "pixel": 24,
+          "value": 24.0
+        }
+      ]
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "selected": true,
+      "name": "color_1",
+      "rgb": [
+        5,
+        125,
+        4
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_2",
+      "rgb": [
+        2,
+        2,
+        2
+      ],
+      "tolerance": 30.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    },
+    {
+      "selected": true,
+      "name": "color_3",
+      "rgb": [
+        57,
+        149,
+        58
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_4",
+      "rgb": [
+        226,
+        19,
+        18
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_5",
+      "rgb": [
+        124,
+        185,
+        124
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_6",
+      "rgb": [
+        192,
+        173,
+        195
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_7",
+      "rgb": [
+        28,
+        29,
+        236
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_8",
+      "rgb": [
+        95,
+        49,
+        41
+      ],
+      "tolerance": 38.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    }
+  ],
+  "output": {
+    "x_step": null,
+    "max_interpolate_gap_px": 8
+  },
+  "detected_ticks": {
+    "x": [
+      {
+        "pixel": 104,
+        "strength": 28,
+        "width_px": 2
+      },
+      {
+        "pixel": 162,
+        "strength": 13,
+        "width_px": 3
+      },
+      {
+        "pixel": 211,
+        "strength": 10,
+        "width_px": 3
+      },
+      {
+        "pixel": 220,
+        "strength": 18,
+        "width_px": 3
+      },
+      {
+        "pixel": 230,
+        "strength": 10,
+        "width_px": 7
+      },
+      {
+        "pixel": 335,
+        "strength": 17,
+        "width_px": 3
+      },
+      {
+        "pixel": 393,
+        "strength": 10,
+        "width_px": 2
+      },
+      {
+        "pixel": 450,
+        "strength": 11,
+        "width_px": 2
+      },
+      {
+        "pixel": 508,
+        "strength": 7,
+        "width_px": 2
+      },
+      {
+        "pixel": 566,
+        "strength": 11,
+        "width_px": 3
+      },
+      {
+        "pixel": 624,
+        "strength": 7,
+        "width_px": 2
+      },
+      {
+        "pixel": 682,
+        "strength": 28,
+        "width_px": 2
+      }
+    ],
+    "y": [
+      {
+        "pixel": 488,
+        "strength": 18,
+        "width_px": 2
+      },
+      {
+        "pixel": 478,
+        "strength": 31,
+        "width_px": 8
+      },
+      {
+        "pixel": 440,
+        "strength": 6,
+        "width_px": 2
+      },
+      {
+        "pixel": 403,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 365,
+        "strength": 6,
+        "width_px": 3
+      },
+      {
+        "pixel": 328,
+        "strength": 15,
+        "width_px": 6
+      },
+      {
+        "pixel": 290,
+        "strength": 15,
+        "width_px": 2
+      },
+      {
+        "pixel": 257,
+        "strength": 4,
+        "width_px": 3
+      },
+      {
+        "pixel": 251,
+        "strength": 12,
+        "width_px": 2
+      },
+      {
+        "pixel": 244,
+        "strength": 12,
+        "width_px": 7
+      },
+      {
+        "pixel": 222,
+        "strength": 9,
+        "width_px": 2
+      },
+      {
+        "pixel": 214,
+        "strength": 6,
+        "width_px": 2
+      },
+      {
+        "pixel": 176,
+        "strength": 20,
+        "width_px": 6
+      },
+      {
+        "pixel": 168,
+        "strength": 4,
+        "width_px": 1
+      },
+      {
+        "pixel": 149,
+        "strength": 7,
+        "width_px": 4
+      },
+      {
+        "pixel": 138,
+        "strength": 11,
+        "width_px": 6
+      },
+      {
+        "pixel": 131,
+        "strength": 4,
+        "width_px": 1
+      },
+      {
+        "pixel": 100,
+        "strength": 19,
+        "width_px": 10
+      },
+      {
+        "pixel": 82,
+        "strength": 7,
+        "width_px": 2
+      },
+      {
+        "pixel": 62,
+        "strength": 6,
+        "width_px": 2
+      },
+      {
+        "pixel": 6,
+        "strength": 18,
+        "width_px": 3
+      }
+    ]
+  },
+  "tick_detection": {
+    "params": {
+      "search_px": 18,
+      "dark_threshold": 200,
+      "min_tick_len": 5,
+      "max_cluster_width": 14
+    },
+    "score": 3.7904761904761908,
+    "x_candidates": 12,
+    "y_candidates": 21,
+    "y_label_assisted": true,
+    "y_label_rows": 7
+  },
+  "calibration_qc": {
+    "status": "needs_verification",
+    "score": 96.0,
+    "warnings": [
+      "y: calibrated from detected tick label rows"
+    ],
+    "x": {
+      "expected_count": 6,
+      "used_count": 6,
+      "used_pixels": [
+        104,
+        220,
+        335,
+        450,
+        566,
+        682
+      ],
+      "max_residual_px": 0.5906505070493081,
+      "max_spacing_residual_px": 0.7999999999999545,
+      "coverage": 0.996551724137931,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.6726190476190476,
+      "score": 96.8,
+      "status": "pass",
+      "warnings": []
+    },
+    "y": {
+      "expected_count": 7,
+      "used_count": 7,
+      "used_pixels": [
+        477,
+        402,
+        326,
+        250,
+        174,
+        99,
+        24
+      ],
+      "max_residual_px": 0.6780484513125418,
+      "max_spacing_residual_px": 1.0,
+      "coverage": 0.934020618556701,
+      "candidate_match_ratio": 0.8571428571428571,
+      "mean_strength_ratio": 0.6021505376344086,
+      "score": 96.0,
+      "status": "pass",
+      "warnings": []
+    },
+    "y_label_rows": [
+      {
+        "pixel": 477,
+        "strength": 141,
+        "width_px": 12,
+        "source": "label"
+      },
+      {
+        "pixel": 402,
+        "strength": 125,
+        "width_px": 13,
+        "source": "label"
+      },
+      {
+        "pixel": 326,
+        "strength": 251,
+        "width_px": 29,
+        "source": "label"
+      },
+      {
+        "pixel": 250,
+        "strength": 212,
+        "width_px": 12,
+        "source": "label"
+      },
+      {
+        "pixel": 174,
+        "strength": 246,
+        "width_px": 12,
+        "source": "label"
+      },
+      {
+        "pixel": 99,
+        "strength": 279,
+        "width_px": 26,
+        "source": "label"
+      },
+      {
+        "pixel": 24,
+        "strength": 260,
+        "width_px": 27,
+        "source": "label"
+      }
+    ],
+    "y_label_assisted": true,
+    "auto_status": "pass",
+    "verified": false,
+    "verified_at": null,
+    "verified_note": "",
+    "usable": false
+  },
+  "calibration_verification": {
+    "verified": false
+  },
+  "y_label_rows": [
+    {
+      "pixel": 477,
+      "strength": 141,
+      "width_px": 12,
+      "source": "label"
+    },
+    {
+      "pixel": 402,
+      "strength": 125,
+      "width_px": 13,
+      "source": "label"
+    },
+    {
+      "pixel": 326,
+      "strength": 251,
+      "width_px": 29,
+      "source": "label"
+    },
+    {
+      "pixel": 250,
+      "strength": 212,
+      "width_px": 12,
+      "source": "label"
+    },
+    {
+      "pixel": 174,
+      "strength": 246,
+      "width_px": 12,
+      "source": "label"
+    },
+    {
+      "pixel": 99,
+      "strength": 279,
+      "width_px": 26,
+      "source": "label"
+    },
+    {
+      "pixel": 24,
+      "strength": 260,
+      "width_px": 27,
+      "source": "label"
+    }
+  ]
+}

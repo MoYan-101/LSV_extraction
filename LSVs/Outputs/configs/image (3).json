@@ -1,0 +1,558 @@
+{
+  "plot_area": {
+    "left": 1,
+    "right": 766,
+    "top": 2,
+    "bottom": 467
+  },
+  "axes": {
+    "x": {
+      "min": 1.0,
+      "max": 2.0,
+      "scale": "linear",
+      "pixel_min": 1,
+      "pixel_max": 766,
+      "calibration": [
+        {
+          "pixel": 1,
+          "value": 1.0
+        },
+        {
+          "pixel": 153,
+          "value": 1.2
+        },
+        {
+          "pixel": 306,
+          "value": 1.4
+        },
+        {
+          "pixel": 458,
+          "value": 1.6
+        },
+        {
+          "pixel": 610,
+          "value": 1.8
+        },
+        {
+          "pixel": 763,
+          "value": 2.0
+        }
+      ]
+    },
+    "y": {
+      "min": 0.0,
+      "max": 24.0,
+      "scale": "linear",
+      "pixel_min": 467,
+      "pixel_max": 2,
+      "calibration": [
+        {
+          "pixel": 365,
+          "value": 0.0
+        },
+        {
+          "pixel": 313,
+          "value": 4.0
+        },
+        {
+          "pixel": 301,
+          "value": 8.0
+        },
+        {
+          "pixel": 265,
+          "value": 12.0
+        },
+        {
+          "pixel": 231,
+          "value": 16.0
+        },
+        {
+          "pixel": 202,
+          "value": 20.0
+        },
+        {
+          "pixel": 168,
+          "value": 24.0
+        }
+      ]
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "selected": true,
+      "name": "color_1",
+      "rgb": [
+        2,
+        2,
+        2
+      ],
+      "tolerance": 30,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    }
+  ],
+  "output": {
+    "x_step": null,
+    "max_interpolate_gap_px": 8
+  },
+  "calibration_verification": {
+    "verified": false
+  },
+  "detected_ticks": {
+    "x": [
+      {
+        "pixel": 1,
+        "strength": 53,
+        "width_px": 1
+      },
+      {
+        "pixel": 82,
+        "strength": 21,
+        "width_px": 5
+      },
+      {
+        "pixel": 89,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 112,
+        "strength": 46,
+        "width_px": 14
+      },
+      {
+        "pixel": 126,
+        "strength": 31,
+        "width_px": 7
+      },
+      {
+        "pixel": 130,
+        "strength": 29,
+        "width_px": 15
+      },
+      {
+        "pixel": 134,
+        "strength": 34,
+        "width_px": 5
+      },
+      {
+        "pixel": 142,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 153,
+        "strength": 30,
+        "width_px": 7
+      },
+      {
+        "pixel": 160,
+        "strength": 27,
+        "width_px": 6
+      },
+      {
+        "pixel": 170,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 174,
+        "strength": 29,
+        "width_px": 13
+      },
+      {
+        "pixel": 178,
+        "strength": 28,
+        "width_px": 4
+      },
+      {
+        "pixel": 188,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 197,
+        "strength": 33,
+        "width_px": 7
+      },
+      {
+        "pixel": 205,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 219,
+        "strength": 39,
+        "width_px": 15
+      },
+      {
+        "pixel": 231,
+        "strength": 27,
+        "width_px": 5
+      },
+      {
+        "pixel": 241,
+        "strength": 35,
+        "width_px": 8
+      },
+      {
+        "pixel": 248,
+        "strength": 26,
+        "width_px": 4
+      },
+      {
+        "pixel": 258,
+        "strength": 27,
+        "width_px": 4
+      },
+      {
+        "pixel": 262,
+        "strength": 28,
+        "width_px": 13
+      },
+      {
+        "pixel": 266,
+        "strength": 26,
+        "width_px": 4
+      },
+      {
+        "pixel": 276,
+        "strength": 26,
+        "width_px": 5
+      },
+      {
+        "pixel": 284,
+        "strength": 29,
+        "width_px": 7
+      },
+      {
+        "pixel": 293,
+        "strength": 26,
+        "width_px": 5
+      },
+      {
+        "pixel": 302,
+        "strength": 28,
+        "width_px": 6
+      },
+      {
+        "pixel": 306,
+        "strength": 28,
+        "width_px": 14
+      },
+      {
+        "pixel": 310,
+        "strength": 29,
+        "width_px": 4
+      },
+      {
+        "pixel": 321,
+        "strength": 25,
+        "width_px": 4
+      },
+      {
+        "pixel": 327,
+        "strength": 43,
+        "width_px": 13
+      },
+      {
+        "pixel": 338,
+        "strength": 27,
+        "width_px": 4
+      },
+      {
+        "pixel": 347,
+        "strength": 32,
+        "width_px": 8
+      },
+      {
+        "pixel": 355,
+        "strength": 25,
+        "width_px": 5
+      },
+      {
+        "pixel": 364,
+        "strength": 24,
+        "width_px": 3
+      },
+      {
+        "pixel": 370,
+        "strength": 26,
+        "width_px": 15
+      },
+      {
+        "pixel": 373,
+        "strength": 25,
+        "width_px": 4
+      },
+      {
+        "pixel": 382,
+        "strength": 24,
+        "width_px": 6
+      },
+      {
+        "pixel": 392,
+        "strength": 26,
+        "width_px": 8
+      },
+      {
+        "pixel": 399,
+        "strength": 23,
+        "width_px": 5
+      },
+      {
+        "pixel": 410,
+        "strength": 23,
+        "width_px": 2
+      },
+      {
+        "pixel": 414,
+        "strength": 29,
+        "width_px": 14
+      },
+      {
+        "pixel": 417,
+        "strength": 29,
+        "width_px": 5
+      },
+      {
+        "pixel": 427,
+        "strength": 12,
+        "width_px": 5
+      },
+      {
+        "pixel": 436,
+        "strength": 32,
+        "width_px": 7
+      },
+      {
+        "pixel": 445,
+        "strength": 21,
+        "width_px": 1
+      },
+      {
+        "pixel": 448,
+        "strength": 11,
+        "width_px": 3
+      },
+      {
+        "pixel": 458,
+        "strength": 22,
+        "width_px": 9
+      },
+      {
+        "pixel": 480,
+        "strength": 9,
+        "width_px": 7
+      },
+      {
+        "pixel": 501,
+        "strength": 9,
+        "width_px": 7
+      },
+      {
+        "pixel": 524,
+        "strength": 14,
+        "width_px": 8
+      },
+      {
+        "pixel": 546,
+        "strength": 25,
+        "width_px": 7
+      },
+      {
+        "pixel": 567,
+        "strength": 14,
+        "width_px": 7
+      },
+      {
+        "pixel": 588,
+        "strength": 9,
+        "width_px": 8
+      },
+      {
+        "pixel": 610,
+        "strength": 9,
+        "width_px": 7
+      },
+      {
+        "pixel": 632,
+        "strength": 14,
+        "width_px": 7
+      },
+      {
+        "pixel": 655,
+        "strength": 25,
+        "width_px": 7
+      },
+      {
+        "pixel": 676,
+        "strength": 14,
+        "width_px": 8
+      },
+      {
+        "pixel": 697,
+        "strength": 9,
+        "width_px": 7
+      },
+      {
+        "pixel": 719,
+        "strength": 9,
+        "width_px": 7
+      },
+      {
+        "pixel": 741,
+        "strength": 14,
+        "width_px": 7
+      },
+      {
+        "pixel": 763,
+        "strength": 45,
+        "width_px": 7
+      }
+    ],
+    "y": [
+      {
+        "pixel": 365,
+        "strength": 21,
+        "width_px": 6
+      },
+      {
+        "pixel": 313,
+        "strength": 27,
+        "width_px": 9
+      },
+      {
+        "pixel": 301,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 291,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 281,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 265,
+        "strength": 20,
+        "width_px": 15
+      },
+      {
+        "pixel": 240,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 231,
+        "strength": 11,
+        "width_px": 4
+      },
+      {
+        "pixel": 222,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 212,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 202,
+        "strength": 15,
+        "width_px": 5
+      },
+      {
+        "pixel": 181,
+        "strength": 16,
+        "width_px": 8
+      },
+      {
+        "pixel": 168,
+        "strength": 27,
+        "width_px": 10
+      }
+    ]
+  },
+  "tick_detection": {
+    "params": {
+      "search_px": 26,
+      "dark_threshold": 170,
+      "min_tick_len": 8,
+      "max_cluster_width": 20
+    },
+    "score": 86.74095238095238,
+    "x_candidates": 62,
+    "y_candidates": 13,
+    "y_label_assisted": false,
+    "y_label_rows": 0
+  },
+  "y_label_rows": [],
+  "calibration_qc": {
+    "status": "fail",
+    "score": 54.0,
+    "warnings": [
+      "y: tick residual 19.2px > 3px",
+      "y: tick span covers only 42% of plot area"
+    ],
+    "x": {
+      "expected_count": 6,
+      "used_count": 6,
+      "used_pixels": [
+        1,
+        153,
+        306,
+        458,
+        610,
+        763
+      ],
+      "max_residual_px": 0.3907119194949129,
+      "max_spacing_residual_px": 0.6000000000000227,
+      "coverage": 0.996078431372549,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.5880503144654088,
+      "score": 97.6,
+      "status": "pass",
+      "warnings": []
+    },
+    "y": {
+      "expected_count": 7,
+      "used_count": 7,
+      "used_pixels": [
+        365,
+        313,
+        301,
+        265,
+        231,
+        202,
+        168
+      ],
+      "max_residual_px": 14.26274065685154,
+      "max_spacing_residual_px": 19.166666666666686,
+      "coverage": 0.4236559139784946,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.7195767195767195,
+      "score": 54.0,
+      "status": "fail",
+      "warnings": [
+        "tick residual 19.2px > 3px",
+        "tick span covers only 42% of plot area"
+      ]
+    },
+    "y_label_rows": [],
+    "y_label_assisted": false,
+    "auto_status": "fail",
+    "verified": false,
+    "verified_at": null,
+    "verified_note": "",
+    "usable": false
+  }
+}

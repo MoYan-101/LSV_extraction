@@ -1,0 +1,672 @@
+{
+  "plot_area": {
+    "left": 111,
+    "right": 714,
+    "top": 1,
+    "bottom": 471
+  },
+  "axes": {
+    "x": {
+      "min": 1.0,
+      "max": 2.0,
+      "scale": "linear",
+      "pixel_min": 111,
+      "pixel_max": 714,
+      "calibration": [
+        {
+          "pixel": 201,
+          "value": 1.0
+        },
+        {
+          "pixel": 301,
+          "value": 1.2
+        },
+        {
+          "pixel": 401,
+          "value": 1.4
+        },
+        {
+          "pixel": 501,
+          "value": 1.6
+        },
+        {
+          "pixel": 601,
+          "value": 1.8
+        },
+        {
+          "pixel": 701,
+          "value": 2.0
+        }
+      ]
+    },
+    "y": {
+      "min": 0.0,
+      "max": 24.0,
+      "scale": "linear",
+      "pixel_min": 471,
+      "pixel_max": 1,
+      "calibration": [
+        {
+          "pixel": 263,
+          "value": 0.0
+        },
+        {
+          "pixel": 222,
+          "value": 4.0
+        },
+        {
+          "pixel": 181,
+          "value": 8.0
+        },
+        {
+          "pixel": 138,
+          "value": 12.0
+        },
+        {
+          "pixel": 98,
+          "value": 16.0
+        },
+        {
+          "pixel": 56,
+          "value": 20.0
+        },
+        {
+          "pixel": 15,
+          "value": 24.0
+        }
+      ]
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "selected": true,
+      "name": "color_1",
+      "rgb": [
+        3,
+        3,
+        3
+      ],
+      "tolerance": 30,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    },
+    {
+      "selected": true,
+      "name": "color_2",
+      "rgb": [
+        9,
+        127,
+        9
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_3",
+      "rgb": [
+        233,
+        79,
+        62
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_4",
+      "rgb": [
+        71,
+        73,
+        91
+      ],
+      "tolerance": 30,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    },
+    {
+      "selected": true,
+      "name": "color_5",
+      "rgb": [
+        95,
+        16,
+        222
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_6",
+      "rgb": [
+        128,
+        191,
+        137
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_7",
+      "rgb": [
+        223,
+        168,
+        178
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    },
+    {
+      "selected": true,
+      "name": "color_8",
+      "rgb": [
+        182,
+        68,
+        122
+      ],
+      "tolerance": 38,
+      "min_area": 20,
+      "min_x_span": 20,
+      "saturation_min": 40
+    }
+  ],
+  "output": {
+    "x_step": null,
+    "max_interpolate_gap_px": 8
+  },
+  "calibration_verification": {
+    "verified": false
+  },
+  "detected_ticks": {
+    "x": [
+      {
+        "pixel": 113,
+        "strength": 36,
+        "width_px": 5
+      },
+      {
+        "pixel": 122,
+        "strength": 14,
+        "width_px": 4
+      },
+      {
+        "pixel": 128,
+        "strength": 14,
+        "width_px": 3
+      },
+      {
+        "pixel": 201,
+        "strength": 14,
+        "width_px": 5
+      },
+      {
+        "pixel": 212,
+        "strength": 11,
+        "width_px": 4
+      },
+      {
+        "pixel": 225,
+        "strength": 14,
+        "width_px": 5
+      },
+      {
+        "pixel": 301,
+        "strength": 14,
+        "width_px": 5
+      },
+      {
+        "pixel": 312,
+        "strength": 12,
+        "width_px": 4
+      },
+      {
+        "pixel": 327,
+        "strength": 14,
+        "width_px": 5
+      },
+      {
+        "pixel": 401,
+        "strength": 14,
+        "width_px": 6
+      },
+      {
+        "pixel": 412,
+        "strength": 12,
+        "width_px": 4
+      },
+      {
+        "pixel": 426,
+        "strength": 14,
+        "width_px": 4
+      },
+      {
+        "pixel": 501,
+        "strength": 14,
+        "width_px": 6
+      },
+      {
+        "pixel": 513,
+        "strength": 12,
+        "width_px": 4
+      },
+      {
+        "pixel": 527,
+        "strength": 14,
+        "width_px": 5
+      },
+      {
+        "pixel": 601,
+        "strength": 14,
+        "width_px": 6
+      },
+      {
+        "pixel": 613,
+        "strength": 12,
+        "width_px": 4
+      },
+      {
+        "pixel": 622,
+        "strength": 13,
+        "width_px": 7
+      },
+      {
+        "pixel": 701,
+        "strength": 14,
+        "width_px": 6
+      },
+      {
+        "pixel": 712,
+        "strength": 36,
+        "width_px": 4
+      }
+    ],
+    "y": [
+      {
+        "pixel": 469,
+        "strength": 44,
+        "width_px": 4
+      },
+      {
+        "pixel": 460,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 448,
+        "strength": 8,
+        "width_px": 3
+      },
+      {
+        "pixel": 429,
+        "strength": 44,
+        "width_px": 6
+      },
+      {
+        "pixel": 418,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 408,
+        "strength": 8,
+        "width_px": 3
+      },
+      {
+        "pixel": 395,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 387,
+        "strength": 32,
+        "width_px": 4
+      },
+      {
+        "pixel": 377,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 366,
+        "strength": 8,
+        "width_px": 2
+      },
+      {
+        "pixel": 354,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 345,
+        "strength": 21,
+        "width_px": 4
+      },
+      {
+        "pixel": 336,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 324,
+        "strength": 8,
+        "width_px": 2
+      },
+      {
+        "pixel": 304,
+        "strength": 22,
+        "width_px": 4
+      },
+      {
+        "pixel": 284,
+        "strength": 8,
+        "width_px": 3
+      },
+      {
+        "pixel": 271,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 263,
+        "strength": 22,
+        "width_px": 5
+      },
+      {
+        "pixel": 253,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 243,
+        "strength": 8,
+        "width_px": 2
+      },
+      {
+        "pixel": 230,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 221,
+        "strength": 22,
+        "width_px": 4
+      },
+      {
+        "pixel": 211,
+        "strength": 19,
+        "width_px": 1
+      },
+      {
+        "pixel": 201,
+        "strength": 8,
+        "width_px": 1
+      },
+      {
+        "pixel": 180,
+        "strength": 29,
+        "width_px": 5
+      },
+      {
+        "pixel": 159,
+        "strength": 8,
+        "width_px": 1
+      },
+      {
+        "pixel": 147,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 139,
+        "strength": 22,
+        "width_px": 5
+      },
+      {
+        "pixel": 129,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 120,
+        "strength": 14,
+        "width_px": 2
+      },
+      {
+        "pixel": 117,
+        "strength": 8,
+        "width_px": 1
+      },
+      {
+        "pixel": 106,
+        "strength": 9,
+        "width_px": 1
+      },
+      {
+        "pixel": 97,
+        "strength": 22,
+        "width_px": 4
+      },
+      {
+        "pixel": 92,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 88,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 78,
+        "strength": 8,
+        "width_px": 2
+      },
+      {
+        "pixel": 61,
+        "strength": 20,
+        "width_px": 4
+      },
+      {
+        "pixel": 56,
+        "strength": 22,
+        "width_px": 4
+      },
+      {
+        "pixel": 35,
+        "strength": 8,
+        "width_px": 3
+      },
+      {
+        "pixel": 23,
+        "strength": 10,
+        "width_px": 1
+      },
+      {
+        "pixel": 15,
+        "strength": 44,
+        "width_px": 5
+      },
+      {
+        "pixel": 5,
+        "strength": 10,
+        "width_px": 1
+      }
+    ]
+  },
+  "tick_detection": {
+    "params": {
+      "search_px": 26,
+      "dark_threshold": 210,
+      "min_tick_len": 8,
+      "max_cluster_width": 14
+    },
+    "score": 55.58904761904763,
+    "x_candidates": 20,
+    "y_candidates": 42,
+    "y_label_assisted": true,
+    "y_label_rows": 7
+  },
+  "y_label_rows": [
+    {
+      "pixel": 263,
+      "strength": 346,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 222,
+      "strength": 372,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 181,
+      "strength": 387,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 138,
+      "strength": 323,
+      "width_px": 15,
+      "source": "label"
+    },
+    {
+      "pixel": 98,
+      "strength": 409,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 56,
+      "strength": 389,
+      "width_px": 31,
+      "source": "label"
+    },
+    {
+      "pixel": 15,
+      "strength": 402,
+      "width_px": 31,
+      "source": "label"
+    }
+  ],
+  "calibration_qc": {
+    "status": "needs_verification",
+    "score": 78.0,
+    "warnings": [
+      "x: tick span covers 83% of plot area",
+      "y: tick span covers only 53% of plot area",
+      "y: calibrated from detected tick label rows"
+    ],
+    "x": {
+      "expected_count": 6,
+      "used_count": 6,
+      "used_pixels": [
+        201,
+        301,
+        401,
+        501,
+        601,
+        701
+      ],
+      "max_residual_px": 4.440892098500628e-13,
+      "max_spacing_residual_px": 0.0,
+      "coverage": 0.8291873963515755,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.3888888888888889,
+      "score": 93.0,
+      "status": "pass",
+      "warnings": [
+        "tick span covers 83% of plot area"
+      ]
+    },
+    "y": {
+      "expected_count": 7,
+      "used_count": 7,
+      "used_pixels": [
+        263,
+        222,
+        181,
+        138,
+        98,
+        56,
+        15
+      ],
+      "max_residual_px": 1.000000000000123,
+      "max_spacing_residual_px": 1.0,
+      "coverage": 0.5276595744680851,
+      "candidate_match_ratio": 1.0,
+      "mean_strength_ratio": 0.5941558441558441,
+      "score": 78.0,
+      "status": "review",
+      "warnings": [
+        "tick span covers only 53% of plot area"
+      ]
+    },
+    "y_label_rows": [
+      {
+        "pixel": 263,
+        "strength": 346,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 222,
+        "strength": 372,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 181,
+        "strength": 387,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 138,
+        "strength": 323,
+        "width_px": 15,
+        "source": "label"
+      },
+      {
+        "pixel": 98,
+        "strength": 409,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 56,
+        "strength": 389,
+        "width_px": 31,
+        "source": "label"
+      },
+      {
+        "pixel": 15,
+        "strength": 402,
+        "width_px": 31,
+        "source": "label"
+      }
+    ],
+    "y_label_assisted": true,
+    "auto_status": "review",
+    "verified": false,
+    "verified_at": null,
+    "verified_note": "",
+    "usable": false
+  }
+}

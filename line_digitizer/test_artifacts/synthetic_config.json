@@ -1,0 +1,66 @@
+{
+  "plot_area": {
+    "left": 147,
+    "right": 1082,
+    "top": 87,
+    "bottom": 792
+  },
+  "axes": {
+    "x": {
+      "min": 1.2,
+      "max": 1.8,
+      "scale": "linear",
+      "pixel_min": 147,
+      "pixel_max": 1082
+    },
+    "y": {
+      "min": -2.0,
+      "max": 50.0,
+      "scale": "linear",
+      "pixel_min": 792,
+      "pixel_max": 87
+    }
+  },
+  "border_margin_px": 2,
+  "ignore_regions": [],
+  "series": [
+    {
+      "name": "blue",
+      "rgb": [
+        35,
+        45,
+        220
+      ],
+      "tolerance": 42.0,
+      "min_area": 20,
+      "min_x_span": 20
+    },
+    {
+      "name": "red",
+      "rgb": [
+        220,
+        35,
+        55
+      ],
+      "tolerance": 42.0,
+      "min_area": 20,
+      "min_x_span": 20
+    },
+    {
+      "name": "black",
+      "rgb": [
+        30,
+        30,
+        30
+      ],
+      "tolerance": 30.0,
+      "min_area": 20,
+      "min_x_span": 20,
+      "keep_largest_components": 1
+    }
+  ],
+  "output": {
+    "x_step": 0.005,
+    "max_interpolate_gap_px": 8
+  }
+}
